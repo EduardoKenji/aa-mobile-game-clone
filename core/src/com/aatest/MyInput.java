@@ -8,6 +8,7 @@ import com.badlogic.gdx.InputProcessor;
 public class MyInput implements InputProcessor {
 
     MyApplication game;
+    int i;
 
     MyInput(MyApplication game) {
         this.game = game;
@@ -37,7 +38,7 @@ public class MyInput implements InputProcessor {
             Core.wrongPosition = true;
         }
         if(game.gameState.equals("lose") || game.gameState.equals("win")) {
-            game.setScreen(new Core(game));
+            game.setScreen(new Core(game, "angularSpeed 0.9 radius 460 circleNum 14 acceleration 0.12 variableRadius -140 30 2 invert fuzzy 4.5 1.5 0.7"));
         }
         return true;
     }

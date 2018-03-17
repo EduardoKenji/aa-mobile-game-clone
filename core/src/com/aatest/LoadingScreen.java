@@ -52,7 +52,7 @@ public class LoadingScreen implements Screen {
     @Override
     public void render(float delta) {
         if(game.getAssetManager().update()) {
-            game.setScreen(new Core(game));
+            game.setScreen(new Core(game, "angularSpeed 0.9 radius 460 circleNum 14 acceleration 0.12 variableRadius -140 30 2 invert fuzzy 4.5 1.5 0.7"));
         } else {
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
             shapeRenderer.setColor(0, 1, 0, 1);

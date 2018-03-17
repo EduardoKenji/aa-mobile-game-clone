@@ -5,8 +5,6 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
-import java.awt.Font;
-
 /**
  * Created by Mario on 17/03/2018.
  */
@@ -14,17 +12,20 @@ public class Circle {
     float x, y, radius;
     float vel;
     Text centerText;
-    boolean isTouched;
-    boolean isSpinning;
+    boolean Touched;
+    boolean Spinning;
     float angle;
+    float angularSpeed;
+    int i;
 
-    Circle(float x, float y, float radius, String text, BitmapFont font, GlyphLayout glyphLayout, float vel) {
+    Circle(float x, float y, float radius, String text, BitmapFont font, GlyphLayout glyphLayout, float vel, float angularSpeed) {
         this.x = x;
         this.y = y;
         this.vel = vel;
         this.radius = radius;
-        isTouched = false;
-        isSpinning = false;
+        this.angularSpeed = angularSpeed;
+        Touched = false;
+        Spinning = false;
         angle = 270f;
         centerText = new Text(glyphLayout, x+(1), y, text, "center", font);
     }
@@ -54,14 +55,38 @@ public class Circle {
     }
 
     void update(float delta, Circle centerCircle, float toleranceRadius) {
-        if(isTouched) {
+        if(Touched) {
             if(centerCircle.getY()-toleranceRadius-y < vel) {
                 y=y+(centerCircle.getY()-toleranceRadius-y);
                 centerText.setY(y);
-                isTouched = false;
+                Touched = false;
                 Core.spinningCircles.add(this);
                 Core.movingTouchableCircles.remove(this);
-                isSpinning = true;
+                Spinning = true;
+                if(Core.modifiers_values[0] > 0) {
+                    for(i = 0; i < Core.circleList.size(); i++) {
+                        if(Core.circleList.get(i).getAngularSpeed() < 0) {
+                            if(Core.fuzzyMode == 1) {
+                                Core.circleList.get(i).setAngularSpeed(Core.circleList.get(i).getAngularSpeed()-(Core.modifiers_values[0]*Core.fuzzySpeedVariance));
+                            } else {
+                                Core.circleList.get(i).setAngularSpeed(Core.circleList.get(i).getAngularSpeed()-Core.modifiers_values[0]);
+                            }
+                        } else {
+                            if(Core.fuzzyMode == 1) {
+                                Core.circleList.get(i).setAngularSpeed(Core.circleList.get(i).getAngularSpeed()+(Core.modifiers_values[0]*Core.fuzzySpeedVariance));
+                            } else {
+                                Core.circleList.get(i).setAngularSpeed(Core.circleList.get(i).getAngularSpeed()+Core.modifiers_values[0]);
+                            }
+
+                        }
+                    }
+                }
+                if(Core.modifiers_values[1] == 1) {
+                    for(i = 0; i < Core.circleList.size(); i++) {
+                        Core.circleList.get(i).setAngularSpeed(Core.circleList.get(i).getAngularSpeed()*(-1));
+                    }
+                }
+
             } else {
                 y=y+vel;
                 centerText.setY(y);
@@ -69,7 +94,9 @@ public class Circle {
             }
         }
 
-        if(isSpinning) {
+        if(Spinning) {
+            angle += angularSpeed;
+            if(angle >= 360) angle = 0;
             y = centerCircle.getY()+((float)(Math.sin(Math.toRadians(angle)))*toleranceRadius);
             x = centerCircle.getX()+((float) (Math.cos(Math.toRadians(angle)))*toleranceRadius);
             centerText.setY(y);
@@ -77,12 +104,16 @@ public class Circle {
         }
     }
 
+    public float getAngularSpeed() {
+        return angularSpeed;
+    }
+
     public float getRadius() {
         return radius;
     }
 
     public void setSpinning(boolean isSpinning) {
-        this.isSpinning = isSpinning;
+        this.Spinning = isSpinning;
     }
 
     public void setVel(float vel) {
@@ -90,6 +121,10 @@ public class Circle {
     }
 
     public void setTouched(boolean isTouched) {
-        this.isTouched = isTouched;
+        this.Touched = isTouched;
+    }
+
+    public void setAngularSpeed(float angularSpeed) {
+        this.angularSpeed = angularSpeed;
     }
 }
